@@ -1,0 +1,22 @@
+export interface ConfigFileBot {
+    name: string
+    description?: string
+
+    gameLogin?: string
+    gamePassword?: string
+    gameExecPath?: string
+    gameAccessPassword?: string
+    
+    totpSecret?: string
+    
+    ghostIp?: string
+    ghostPort?: number
+
+    openKoreExecPath?: string
+    openKoreExecArgs?: string
+}
+
+export interface ConfigFile {
+    valid: boolean
+    bots?: ConfigFileBot[]
+}

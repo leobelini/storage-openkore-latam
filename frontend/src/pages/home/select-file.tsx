@@ -1,24 +1,22 @@
 import { z } from "zod"
 import { toast } from "sonner"
-import { useForm } from "react-hook-form"
 import { useCallback, useState } from "react"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import type { ConfigFile } from "@/types/config-file"
-import { SelectFolder, CreateFileConfig } from '../../../wailsjs/go/main/App';
+import { LoadFileConfig } from '../../../wailsjs/go/main/App';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 const formSchema = z.object({
   password: z.string().min(1, "Informe uma senha"),
-  filename: z.string().min(1, "Informe um nome").max(50, "O nome deve ter no máximo 50 caracteres").regex(/^[a-z0-9]+$/i, "O nome deve conter apenas letras e números"),
 })
 
 type FormData = z.infer<typeof formSchema>
 
-function NewFile() {
+function SelectFile() {
 
   const [open, setOpen] = useState(false);
 
@@ -26,39 +24,24 @@ function NewFile() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
-      filename: "",
     },
   })
 
   const onSubmit = useCallback(async (data: FormData) => {
     try {
-      let folder = "";
-      try {
-        folder = await SelectFolder();
 
-        if (!folder) {
-          toast("Selecione uma pasta")
-          return;
-        }
-      } catch (error) {
-        toast("Selecione uma pasta")
-        return;
-      }
-      const content: ConfigFile = {
-        valid: true
-      }
+      const configString = await LoadFileConfig(data.password);
 
-      const contentString = JSON.stringify(content);
+      const config = JSON.parse(configString);
 
-      const fileName = [data.filename, ".start-openkore-latam"].join("");
+      if (!config.valid) 
+        throw new Error("Arquivo inválido");
 
-      await CreateFileConfig(folder, fileName, data.password, contentString);
-
-      toast("Arquivo criado com sucesso!")
+      toast("Arquivo selecionado com sucesso!")
       form.reset();
       setOpen(false);
     } catch (error) {
-      toast("Não foi possível criar o arquivo")
+      toast("Não foi possível carregar o arquivo")
       return;
     }
   }, [])
@@ -66,7 +49,7 @@ function NewFile() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Nova configuração</Button>
+        <Button variant="outline">Selecionar configuração</Button>
       </DialogTrigger>
       <DialogContent>
         <Form {...form}>
@@ -90,24 +73,12 @@ function NewFile() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="filename"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do arquivo</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <DialogFooter className="flex flex-row gap-2 justify-end">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">Criar</Button>
+              <Button type="submit">Selecionar</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -116,4 +87,4 @@ function NewFile() {
   )
 }
 
-export default NewFile
+export default SelectFile

@@ -1,14 +1,15 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
 import { FileWarningIcon } from "lucide-react"
+
 import NewFile from "./new-file"
+import SelectFile from "./select-file"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 function Home() {
   return (
     <div className="flex h-screen flex-col">
       <div className="flex w-full items-center justify-center gap-2 p-2">
         <p className="text-sm">Arquivo de configuração:</p>
-        <Button variant="outline">Escolher arquivo</Button>
+        <SelectFile/>
         <NewFile />
       </div>
       <div className="flex w-full items-center justify-center gap-2 px-10 h-full">
