@@ -19,7 +19,7 @@ func main() {
 	err := wails.Run(&options.App{
 		Title:         "Openkore Latam",
 		Width:         600,
-		Height:        300,
+		Height:        500,
 		DisableResize: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
