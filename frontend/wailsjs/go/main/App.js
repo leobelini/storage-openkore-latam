@@ -6,6 +6,10 @@ export function CreateFileConfig(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['CreateFileConfig'](arg1, arg2, arg3, arg4);
 }
 
+export function GetPathFile(arg1) {
+  return window['go']['main']['App']['GetPathFile'](arg1);
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }

@@ -81,9 +81,9 @@ func (a *App) LoadFileConfig(password string) (LoadFileConfigResponse, error) {
 
 	// Abre seletor de arquivo
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Selecione um arquivo",
+		Title: "Selecione uma configuração",
 		Filters: []runtime.FileFilter{
-			{DisplayName: "Todos os arquivos", Pattern: "*"},
+			{DisplayName: "Configuração", Pattern: "*.start-openkore-latam"},
 		},
 	})
 	if err != nil || file == "" {
@@ -106,6 +106,23 @@ func (a *App) LoadFileConfig(password string) (LoadFileConfigResponse, error) {
 	response.Path = file
 
 	return response, nil
+}
+
+type ReplaceFileConfigParam struct {
+	Title  string
+	Filter []runtime.FileFilter
+}
+
+func (a *App) GetPathFile(param ReplaceFileConfigParam) (string, error) {
+	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Title:   param.Title,
+		Filters: param.Filter,
+	})
+	if err != nil || file == "" {
+		return "", err
+	}
+
+	return file, nil
 }
 
 func deriveKey(password, salt []byte) []byte {

@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function CreateFileConfig(arg1:string,arg2:string,arg3:string,arg4:string):Promise<void>;
 
+export function GetPathFile(arg1:main.ReplaceFileConfigParam):Promise<string>;
+
 export function Greet(arg1:string):Promise<string>;
 
 export function LoadFileConfig(arg1:string):Promise<main.LoadFileConfigResponse>;
