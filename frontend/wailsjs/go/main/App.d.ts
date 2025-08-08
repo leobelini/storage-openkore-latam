@@ -8,7 +8,7 @@ export function GetPathFile(arg1:main.ReplaceFileConfigParam):Promise<string>;
 
 export function Greet(arg1:string):Promise<string>;
 
-export function LoadFileConfig(arg1:string):Promise<main.LoadFileConfigResponse>;
+export function LoadFileConfig(arg1:string,arg2:string):Promise<main.LoadFileConfigResponse>;
 
 export function ReplaceFile(arg1:string,arg2:string,arg3:string):Promise<void>;
 

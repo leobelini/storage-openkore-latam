@@ -72,26 +72,14 @@ func (a *App) ReplaceFile(filePath, content, password string) error {
 
 type LoadFileConfigResponse struct {
 	Content string
-	Path    string
 }
 
-func (a *App) LoadFileConfig(password string) (LoadFileConfigResponse, error) {
+func (a *App) LoadFileConfig(password string, filePath string) (LoadFileConfigResponse, error) {
 
 	response := LoadFileConfigResponse{}
 
-	// Abre seletor de arquivo
-	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-		Title: "Selecione uma configuração",
-		Filters: []runtime.FileFilter{
-			{DisplayName: "Configuração", Pattern: "*.start-openkore-latam"},
-		},
-	})
-	if err != nil || file == "" {
-		return response, err
-	}
-
 	// Lê o conteúdo do arquivo
-	data, err := os.ReadFile(file)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return response, err
 	}
@@ -103,7 +91,6 @@ func (a *App) LoadFileConfig(password string) (LoadFileConfigResponse, error) {
 	}
 
 	response.Content = string(decryptedContent)
-	response.Path = file
 
 	return response, nil
 }

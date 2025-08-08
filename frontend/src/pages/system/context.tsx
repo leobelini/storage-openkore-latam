@@ -1,22 +1,13 @@
+import { toast } from "sonner";
 import { createContext, useCallback, useContext, useState } from "react";
 
-import { LoadFileConfig, ReplaceFile } from '../../../wailsjs/go/main/App';
 import type { ConfigFile, ConfigFileBot } from "@/types/config-file";
-import { toast } from "sonner";
+import { LoadFileConfig, ReplaceFile } from '../../../wailsjs/go/main/App';
 
 
 interface SystemContextData {
   config: ConfigFile;
-  // setConfig: (config: ConfigFile) => void;
-
-  // configPath: string;
-  // setConfigPath: (configPath: string) => void;
-
-  // currentBot: ConfigFileBot;
-  // setCurrentBot: (bot: ConfigFileBot) => void;
-
-  loadFile: (password: string) => Promise<void>
-  // updateConfig: () => Promise<void>
+  loadFile: (password: string, filePath: string) => Promise<void>
   createBot: (bot: ConfigFileBot) => Promise<void>
 }
 
@@ -31,10 +22,9 @@ function SystemProvider(props: Props) {
   const [config, setConfig] = useState<ConfigFile>(null!);
   const [configPath, setConfigPath] = useState<string>(null!);
   const [password, setPassword] = useState<string>(null!);
-  // const [currentBot, _setCurrentBot] = useState<ConfigFileBot>(null!);
 
-  const loadFile = useCallback(async (password: string) => {
-    const { Content, Path } = await LoadFileConfig(password);
+  const loadFile = useCallback(async (password: string, filePath: string) => {
+    const { Content } = await LoadFileConfig(password, filePath);
 
     const config = JSON.parse(Content);
 
@@ -42,7 +32,7 @@ function SystemProvider(props: Props) {
       throw new Error("Arquivo inválido");
 
     setConfig(config);
-    setConfigPath(Path);
+    setConfigPath(filePath);
     setPassword(password);
   }, []);
 
@@ -58,8 +48,6 @@ function SystemProvider(props: Props) {
     }
   }, [configPath, password]);
 
-
-
   const createBot = useCallback(async (bot: ConfigFileBot) => {
     const bots = [...(config.bots || []), bot];
     const newConfig = { ...config, bots };
@@ -69,11 +57,8 @@ function SystemProvider(props: Props) {
 
   const contextValue = {
     config,
-    // configPath,
-    // currentBot,
     loadFile,
     createBot
-    // updateConfig
   };
 
   return (

@@ -1,18 +1,20 @@
 import { z } from "zod"
-import type { ConfigFileBot } from "@/types/config-file";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { BotIcon, Gamepad2Icon, UserRoundPlusIcon } from "lucide-react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+import type { ConfigFileBot } from "@/types/config-file";
+
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { GetPathFile } from '../../../wailsjs/go/main/App';
-import { toast } from "sonner";
 import { frontend, main } from "../../../wailsjs/go/models";
-import { v4 as uuidv4 } from 'uuid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   name: z.string().min(4, "Informe nome com no mínimo 4 caracteres").max(50, "O nome deve ter no máximo 50 caracteres"),
@@ -297,7 +299,7 @@ function NewBot(props: Props) {
                       <FormLabel>Caminho do OpenKore<span className="text-destructive">*</span></FormLabel>
                       <div className="flex gap-2">
                         <FormControl>
-                          <Input {...field} />
+                          <Input disabled {...field} />
                         </FormControl>
                         <Button type="button" size="icon" onClick={() => handleSetFieldFile("openKoreExecPath")}><BotIcon /></Button>
                       </div>

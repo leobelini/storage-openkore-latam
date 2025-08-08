@@ -18,7 +18,6 @@ function Home() {
           <AlertTitle>Carregue um arquivo de configuração</AlertTitle>
           <AlertDescription>
             <p>
-
               Para começar, você precisa <b>carregar</b> um arquivo de configuração. <br /> <b>Clique no botão</b> <i>"Escolher arquivo"</i> ou <i>"Nova configuração"</i> para começar.
             </p>
           </AlertDescription>
