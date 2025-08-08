@@ -10,10 +10,10 @@ export interface ConfigFileBot {
     
     totpSecret?: string
     
-    ghostIp?: string
-    ghostPort?: number
+    ghostIp: string
+    ghostPort: number
 
-    openKoreExecPath?: string
+    openKoreExecPath: string
     openKoreExecArgs?: string
 }
 
