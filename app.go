@@ -60,7 +60,25 @@ func (a *App) CreateFileConfig(folderPath, fileName, password, content string) e
 	return os.WriteFile(fullPath, []byte(encryptedContent), 0644)
 }
 
-func (a *App) LoadFileConfig(password string) (string, error) {
+func (a *App) ReplaceFile(filePath, content, password string) error {
+
+	encryptedContent, err := encrypt(content, password)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filePath, []byte(encryptedContent), 0644)
+}
+
+type LoadFileConfigResponse struct {
+	Content string
+	Path    string
+}
+
+func (a *App) LoadFileConfig(password string) (LoadFileConfigResponse, error) {
+
+	response := LoadFileConfigResponse{}
+
 	// Abre seletor de arquivo
 	file, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Selecione um arquivo",
@@ -69,22 +87,25 @@ func (a *App) LoadFileConfig(password string) (string, error) {
 		},
 	})
 	if err != nil || file == "" {
-		return "", err
+		return response, err
 	}
 
 	// Lê o conteúdo do arquivo
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return "", err
+		return response, err
 	}
 
 	// Descriptografa o conteúdo
 	decryptedContent, err := decrypt(string(data), password)
 	if err != nil {
-		return "", err
+		return response, err
 	}
 
-	return string(decryptedContent), nil
+	response.Content = string(decryptedContent)
+	response.Path = file
+
+	return response, nil
 }
 
 func deriveKey(password, salt []byte) []byte {

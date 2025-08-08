@@ -14,6 +14,10 @@ export function LoadFileConfig(arg1) {
   return window['go']['main']['App']['LoadFileConfig'](arg1);
 }
 
+export function ReplaceFile(arg1, arg2, arg3) {
+  return window['go']['main']['App']['ReplaceFile'](arg1, arg2, arg3);
+}
+
 export function SelectFolder() {
   return window['go']['main']['App']['SelectFolder']();
 }

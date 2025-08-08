@@ -1,4 +1,5 @@
 export interface ConfigFileBot {
+    id: string
     name: string
     description?: string
 

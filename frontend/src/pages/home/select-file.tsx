@@ -1,12 +1,13 @@
 import { z } from "zod"
 import { toast } from "sonner"
-import { useCallback, useState } from "react"
+import { useNavigate } from "react-router"
 import { useForm } from "react-hook-form"
+import { useCallback, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { LoadFileConfig } from '../../../wailsjs/go/main/App';
+import { useSystemContext } from "../system/context"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
@@ -17,6 +18,9 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 function SelectFile() {
+  let navigate = useNavigate();
+
+  const { loadFile } = useSystemContext();
 
   const [open, setOpen] = useState(false);
 
@@ -30,16 +34,11 @@ function SelectFile() {
   const onSubmit = useCallback(async (data: FormData) => {
     try {
 
-      const configString = await LoadFileConfig(data.password);
-
-      const config = JSON.parse(configString);
-
-      if (!config.valid) 
-        throw new Error("Arquivo inválido");
-
-      toast("Arquivo selecionado com sucesso!")
+      await loadFile(data.password);
       form.reset();
       setOpen(false);
+      navigate("/system");
+
     } catch (error) {
       toast("Não foi possível carregar o arquivo")
       return;
