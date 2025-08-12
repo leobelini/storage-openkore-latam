@@ -1,10 +1,10 @@
 import { z } from "zod"
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
-import { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCallback, useEffect, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
-import { BotIcon, CopyIcon, Gamepad2Icon } from "lucide-react";
+import { BotIcon, CopyIcon, EyeIcon, EyeOffIcon, Gamepad2Icon } from "lucide-react";
 
 import type { ConfigFileBot } from "@/types/config-file";
 
@@ -50,6 +50,9 @@ type Props = {
 function FormBot(props: Props) {
 
   const { bot, copyButtons, isPreview, onSubmit, showButtons, onCancel } = props
+
+  const [showGameAccessPassword, setShowGameAccessPassword] = useState(false);
+  const [showStorageAccessPassword, setShowStorageAccessPassword] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -125,8 +128,14 @@ function FormBot(props: Props) {
   const handleSubmit = useCallback(async (data: FormData) => {
     if (!onSubmit) return;
     try {
-      const bot: ConfigFileBot = {
-        id: uuidv4(),
+      let id = bot?.id
+
+      if (!id) {
+        id = uuidv4();
+      }
+
+      const botValues: ConfigFileBot = {
+        id,
         name: data.name,
         description: data.description,
         gameLogin: data.gameLogin,
@@ -141,7 +150,7 @@ function FormBot(props: Props) {
         openKoreExecArgs: data.openKoreExecArgs,
       }
 
-      await onSubmit(bot)
+      await onSubmit(botValues)
     } catch (error) {
       const message =
         error instanceof Error
@@ -149,7 +158,7 @@ function FormBot(props: Props) {
           : "Ocorreu um erro ao criar o bot";
       toast(message);
     }
-  }, [onSubmit])
+  }, [onSubmit, bot])
 
   const fillForm = useCallback((bot?: ConfigFileBot) => {
     if (bot) {
@@ -159,6 +168,7 @@ function FormBot(props: Props) {
       form.setValue("gamePassword", bot.gamePassword);
       form.setValue("gameExecPath", bot.gameExecPath);
       form.setValue("gameAccessPassword", bot.gameAccessPassword);
+      form.setValue("storageAccessPassword", bot.storageAccessPassword);
       form.setValue("totpSecret", bot.totpSecret);
       form.setValue("ghostIp", bot.ghostIp);
       form.setValue("ghostPort", bot.ghostPort.toString());
@@ -172,6 +182,8 @@ function FormBot(props: Props) {
   useEffect(() => {
     if (bot) {
       fillForm(bot)
+      setShowGameAccessPassword(false)
+      setShowStorageAccessPassword(false)
     }
   }, [bot])
 
@@ -244,9 +256,14 @@ function FormBot(props: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>PIN de acesso</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} disabled={isPreview} />
-                  </FormControl>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input type={showGameAccessPassword ? "text" : "password"} {...field} disabled={isPreview} />
+                    </FormControl>
+                    <Button type="button" size="icon" onClick={() => setShowGameAccessPassword(!showGameAccessPassword)}>
+                      {showGameAccessPassword ? <EyeIcon /> : <EyeOffIcon />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -258,9 +275,14 @@ function FormBot(props: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>PIN de armazenamento</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} disabled={isPreview} />
-                  </FormControl>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input type={showStorageAccessPassword ? "text" : "password"} {...field} disabled={isPreview} />
+                    </FormControl>
+                    <Button type="button" size="icon" onClick={() => setShowStorageAccessPassword(!showStorageAccessPassword)}>
+                      {showStorageAccessPassword ? <EyeIcon /> : <EyeOffIcon />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -398,7 +420,7 @@ function FormBot(props: Props) {
               form.reset();
               if (onCancel) onCancel();
             }}>Cancelar</Button>
-            <Button type="submit">Criar</Button>
+            <Button type="submit">Salvar</Button>
           </div>
         )}
       </form>
