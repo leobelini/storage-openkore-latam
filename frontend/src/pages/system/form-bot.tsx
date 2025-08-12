@@ -10,6 +10,7 @@ import type { ConfigFileBot } from "@/types/config-file";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { TotpCode } from "@/components/ui/totp-code";
 import { GetPathFile } from '../../../wailsjs/go/main/App';
 import { frontend, main } from "../../../wailsjs/go/models";
@@ -221,7 +222,10 @@ function FormBot(props: Props) {
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={isPreview} />
+                    <Textarea {...field} disabled={isPreview}
+                      className="resize-none"
+                      rows={5}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

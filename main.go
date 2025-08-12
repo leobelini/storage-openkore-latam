@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:         "Openkore Latam",
+		Title:         "Storage - Openkore Latam",
 		Width:         600,
 		Height:        500,
 		DisableResize: true,
