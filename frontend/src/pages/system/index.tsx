@@ -1,15 +1,16 @@
+import { useCallback, useEffect, useState } from "react"
 
 import NewBot from "./new-bot"
+import FormBot from "./form-bot"
+import EditBot from "./edit-bot"
 import { useSystemContext } from "./context"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import type { ConfigFileBot } from "@/types/config-file"
-import { useCallback, useEffect, useState } from "react"
-import FormBot from "./form-bot"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 function System() {
-  const { config, createBot } = useSystemContext()
+  const { config, createBot,updateBot } = useSystemContext()
 
   const [currentBot, setCurrentBot] = useState<ConfigFileBot>(null!);
 
@@ -39,13 +40,16 @@ function System() {
             ))}
           </SelectContent>
         </Select>
+        {currentBot &&
+          <EditBot bot={currentBot} handleEdit={updateBot} />
+        }
         <NewBot handleCreate={createBot} />
 
       </div>
 
-      <Separator className="my-2"/>
+      <Separator className="my-2" />
 
-      {currentBot && <FormBot bot={currentBot} isPreview  copyButtons/>}
+      {currentBot && <FormBot bot={currentBot} isPreview copyButtons />}
     </div>
   )
 }
