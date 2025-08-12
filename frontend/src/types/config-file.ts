@@ -7,6 +7,7 @@ export interface ConfigFileBot {
     gamePassword?: string
     gameExecPath?: string
     gameAccessPassword?: string
+    storageAccessPassword?: string
     
     totpSecret?: string
     

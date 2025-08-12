@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import type { ConfigFileBot } from "@/types/config-file"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import FormBot from "./form-bot"
 
 function System() {
@@ -19,11 +19,17 @@ function System() {
     setCurrentBot(bot);
   }, [config]);
 
+  useEffect(() => {
+    if (config?.bots?.length) {
+      setCurrentBot(config.bots[0]);
+    }
+  }, [config]);
+
   return (
     <div className="flex h-screen flex-col w-screen px-5 py-2">
       <div className="flex w-full items-center justify-center gap-2 p-2">
         <Label id="bot">Bot:</Label>
-        <Select onValueChange={handleSelectBot}>
+        <Select onValueChange={handleSelectBot} value={currentBot?.id}>
           <SelectTrigger className="w-[280px]">
             <SelectValue placeholder="Selecione um bot" />
           </SelectTrigger>

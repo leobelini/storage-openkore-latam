@@ -3,18 +3,18 @@ import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BotIcon, CopyIcon, Gamepad2Icon } from "lucide-react";
 import { useForm, type FieldPath } from "react-hook-form";
+import { BotIcon, CopyIcon, Gamepad2Icon } from "lucide-react";
 
 import type { ConfigFileBot } from "@/types/config-file";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { TotpCode } from "@/components/ui/totp-code";
 import { GetPathFile } from '../../../wailsjs/go/main/App';
 import { frontend, main } from "../../../wailsjs/go/models";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { TotpCode } from "@/components/ui/totp-code";
 
 const formSchema = z.object({
   name: z.string().min(4, "Informe nome com no mínimo 4 caracteres").max(50, "O nome deve ter no máximo 50 caracteres"),
@@ -24,6 +24,7 @@ const formSchema = z.object({
   gamePassword: z.string().optional(),
   gameExecPath: z.string().optional(),
   gameAccessPassword: z.string().optional(),
+  storageAccessPassword: z.string().optional(),
 
   totpSecret: z.string().optional(),
 
@@ -44,18 +45,18 @@ type Props = {
   onSubmit?: (data: ConfigFileBot) => Promise<void>;
   onCancel?: () => void;
   showButtons?: boolean;
-  isEditing?: boolean;
   copyButtons?: boolean;
 }
 function FormBot(props: Props) {
 
-
+  const { bot, copyButtons, isPreview, onSubmit, showButtons, onCancel } = props
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
       gameAccessPassword: "",
+      storageAccessPassword: "",
       gameExecPath: "",
       gameLogin: "",
       gamePassword: "",
@@ -121,8 +122,8 @@ function FormBot(props: Props) {
     });
   }, [form]);
 
-  const onSubmit = useCallback(async (data: FormData) => {
-    if (!props.onSubmit) return;
+  const handleSubmit = useCallback(async (data: FormData) => {
+    if (!onSubmit) return;
     try {
       const bot: ConfigFileBot = {
         id: uuidv4(),
@@ -132,6 +133,7 @@ function FormBot(props: Props) {
         gamePassword: data.gamePassword,
         gameExecPath: data.gameExecPath,
         gameAccessPassword: data.gameAccessPassword,
+        storageAccessPassword: data.storageAccessPassword,
         totpSecret: data.totpSecret,
         ghostIp: data.ghostIp,
         ghostPort: Number(data.ghostPort),
@@ -139,7 +141,7 @@ function FormBot(props: Props) {
         openKoreExecArgs: data.openKoreExecArgs,
       }
 
-      await props.onSubmit(bot)
+      await onSubmit(bot)
     } catch (error) {
       const message =
         error instanceof Error
@@ -147,7 +149,7 @@ function FormBot(props: Props) {
           : "Ocorreu um erro ao criar o bot";
       toast(message);
     }
-  }, [props.onSubmit])
+  }, [onSubmit])
 
   const fillForm = useCallback((bot?: ConfigFileBot) => {
     if (bot) {
@@ -168,15 +170,15 @@ function FormBot(props: Props) {
   }, [])
 
   useEffect(() => {
-    if (props.bot) {
-      fillForm(props.bot)
+    if (bot) {
+      fillForm(bot)
     }
-  }, [props.bot])
+  }, [bot])
 
   return (
 
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
 
         <Tabs defaultValue="general">
           <TabsList className="w-full">
@@ -192,9 +194,9 @@ function FormBot(props: Props) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do bot{!props.isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>Nome do bot{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} disabled={props.isPreview} />
+                    <Input type="text" {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -207,7 +209,7 @@ function FormBot(props: Props) {
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={props.isPreview} />
+                    <Input {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -222,12 +224,12 @@ function FormBot(props: Props) {
               render={({ field }) => (
 
                 <FormItem>
-                  <FormLabel>Caminho do jogo{!props.isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>Caminho do jogo{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
                       <Input disabled {...field} />
                     </FormControl>
-                    {!props.isPreview &&
+                    {!isPreview &&
                       <Button type="button" size="icon" onClick={() => handleSetFieldFile("gameExecPath")}><Gamepad2Icon /></Button>
                     }
                   </div>
@@ -241,9 +243,23 @@ function FormBot(props: Props) {
               name="gameAccessPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Token de acesso</FormLabel>
+                  <FormLabel>PIN de acesso</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} disabled={props.isPreview} />
+                    <Input type="password" {...field} disabled={isPreview} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="storageAccessPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>PIN de armazenamento</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -260,9 +276,9 @@ function FormBot(props: Props) {
                   <FormLabel>Login</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input type="password" {...field} disabled={props.isPreview} />
+                      <Input type="password" {...field} disabled={isPreview} />
                     </FormControl>
-                    {props.copyButtons &&
+                    {copyButtons &&
                       <Button type="button" size="icon" onClick={() => handleCopyValue("gameLogin")}><CopyIcon /></Button>
                     }
                   </div>
@@ -278,9 +294,9 @@ function FormBot(props: Props) {
                   <FormLabel>Senha</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
-                      <Input type="password" {...field} disabled={props.isPreview} />
+                      <Input type="password" {...field} disabled={isPreview} />
                     </FormControl>
-                    {props.copyButtons &&
+                    {copyButtons &&
                       <Button type="button" size="icon" onClick={() => handleCopyValue("gamePassword")}><CopyIcon /></Button>
                     }
                   </div>
@@ -288,7 +304,7 @@ function FormBot(props: Props) {
                 </FormItem>
               )}
             />
-            {!props.isPreview && (
+            {!isPreview && (
               <FormField
                 control={form.control}
                 name="totpSecret"
@@ -296,7 +312,7 @@ function FormBot(props: Props) {
                   <FormItem>
                     <FormLabel>Chave de autenticação (TOTP)</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} disabled={props.isPreview} />
+                      <Input type="password" {...field} disabled={isPreview} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -304,10 +320,10 @@ function FormBot(props: Props) {
               />
             )}
 
-            {props.isPreview && props?.bot?.totpSecret && (
+            {isPreview && bot?.totpSecret && (
               <div className="flex flex-col gap-4">
                 <FormLabel>TOTP</FormLabel>
-                <TotpCode totpSecret={props.bot.totpSecret} />
+                <TotpCode totpSecret={bot.totpSecret} />
               </div>
             )}
           </TabsContent>
@@ -318,9 +334,9 @@ function FormBot(props: Props) {
               name="ghostIp"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IP{!props.isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>IP{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={props.isPreview} />
+                    <Input {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -331,9 +347,9 @@ function FormBot(props: Props) {
               name="ghostPort"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Porta{!props.isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>Porta{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" disabled={props.isPreview} />
+                    <Input {...field} type="number" disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -347,12 +363,12 @@ function FormBot(props: Props) {
               name="openKoreExecPath"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Caminho do OpenKore{!props.isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>Caminho do OpenKore{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
                       <Input disabled {...field} />
                     </FormControl>
-                    {!props.isPreview &&
+                    {!isPreview &&
                       <Button type="button" size="icon" onClick={() => handleSetFieldFile("openKoreExecPath")}><BotIcon /></Button>
                     }
                   </div>
@@ -367,7 +383,7 @@ function FormBot(props: Props) {
                 <FormItem>
                   <FormLabel>Argumentos</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={props.isPreview} />
+                    <Input {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -376,6 +392,15 @@ function FormBot(props: Props) {
           </TabsContent>
         </Tabs>
 
+        {showButtons && (
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => {
+              form.reset();
+              if (onCancel) onCancel();
+            }}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+          </div>
+        )}
       </form>
     </Form>
 
