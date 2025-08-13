@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import NewBot from "./new-bot"
 import FormBot from "./form-bot"
 import EditBot from "./edit-bot"
+import RemoveBot from "./remove-bot"
 import { useSystemContext } from "./context"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -10,7 +11,7 @@ import type { ConfigFileBot } from "@/types/config-file"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 function System() {
-  const { config, createBot,updateBot } = useSystemContext()
+  const { config, createBot,updateBot,removeBot } = useSystemContext()
 
   const [currentBot, setCurrentBot] = useState<ConfigFileBot>(null!);
 
@@ -40,9 +41,12 @@ function System() {
             ))}
           </SelectContent>
         </Select>
-        {currentBot &&
+        {currentBot &&(
+          <>
           <EditBot bot={currentBot} handleEdit={updateBot} />
-        }
+          <RemoveBot bot={currentBot} handleRemove={removeBot} />
+          </>
+        )}
         <NewBot handleCreate={createBot} />
 
       </div>

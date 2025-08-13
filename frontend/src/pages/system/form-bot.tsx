@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
-import { BotIcon, CopyIcon, EyeIcon, EyeOffIcon, Gamepad2Icon } from "lucide-react";
+import { CopyIcon, EyeIcon, EyeOffIcon, Gamepad2Icon } from "lucide-react";
 
 import type { ConfigFileBot } from "@/types/config-file";
 
@@ -29,13 +29,13 @@ const formSchema = z.object({
 
   totpSecret: z.string().optional(),
 
-  ghostIp: z.ipv4({
-    error: "Informe um IP válido",
-  }),
-  ghostPort: z.string().min(1, "Informe um número válido")
-    .refine((value) => !isNaN(parseInt(value)), "Informe um número válido"),
-  openKoreExecPath: z.string().min(1, "Informe um caminho válido"),
-  openKoreExecArgs: z.string().optional(),
+  // ghostIp: z.ipv4({
+  //   error: "Informe um IP válido",
+  // }),
+  // ghostPort: z.string().min(1, "Informe um número válido")
+  //   .refine((value) => !isNaN(parseInt(value)), "Informe um número válido"),
+  // openKoreExecPath: z.string().min(1, "Informe um caminho válido"),
+  // openKoreExecArgs: z.string().optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -64,11 +64,11 @@ function FormBot(props: Props) {
       gameExecPath: "",
       gameLogin: "",
       gamePassword: "",
-      ghostIp: "",
-      ghostPort: null!,
+      // ghostIp: "",
+      // ghostPort: null!,
       name: "",
-      openKoreExecArgs: "",
-      openKoreExecPath: "",
+      // openKoreExecArgs: "",
+      // openKoreExecPath: "",
       totpSecret: "",
     },
   })
@@ -86,15 +86,15 @@ function FormBot(props: Props) {
               }),
             ],
           }),
-          openKoreExecPath: new main.ReplaceFileConfigParam({
-            Title: "Selecione o arquivo",
-            Filter: [
-              new frontend.FileFilter({
-                DisplayName: "OpenKore",
-                Pattern: "start.exe;tkstart.exe;vxstart.exe;winguistart.exe;wxstart.exe",
-              }),
-            ],
-          }),
+          // openKoreExecPath: new main.ReplaceFileConfigParam({
+          //   Title: "Selecione o arquivo",
+          //   Filter: [
+          //     new frontend.FileFilter({
+          //       DisplayName: "OpenKore",
+          //       Pattern: "start.exe;tkstart.exe;vxstart.exe;winguistart.exe;wxstart.exe",
+          //     }),
+          //   ],
+          // }),
         };
 
         const params = configMap[name];
@@ -145,10 +145,10 @@ function FormBot(props: Props) {
         gameAccessPassword: data.gameAccessPassword,
         storageAccessPassword: data.storageAccessPassword,
         totpSecret: data.totpSecret,
-        ghostIp: data.ghostIp,
-        ghostPort: Number(data.ghostPort),
-        openKoreExecPath: data.openKoreExecPath,
-        openKoreExecArgs: data.openKoreExecArgs,
+        // ghostIp: data.ghostIp,
+        // ghostPort: Number(data.ghostPort),
+        // openKoreExecPath: data.openKoreExecPath,
+        // openKoreExecArgs: data.openKoreExecArgs,
       }
 
       await onSubmit(botValues)
@@ -171,10 +171,10 @@ function FormBot(props: Props) {
       form.setValue("gameAccessPassword", bot.gameAccessPassword);
       form.setValue("storageAccessPassword", bot.storageAccessPassword);
       form.setValue("totpSecret", bot.totpSecret);
-      form.setValue("ghostIp", bot.ghostIp);
-      form.setValue("ghostPort", bot.ghostPort.toString());
-      form.setValue("openKoreExecPath", bot.openKoreExecPath);
-      form.setValue("openKoreExecArgs", bot.openKoreExecArgs);
+      // form.setValue("ghostIp", bot.ghostIp);
+      // form.setValue("ghostPort", bot.ghostPort.toString());
+      // form.setValue("openKoreExecPath", bot.openKoreExecPath);
+      // form.setValue("openKoreExecArgs", bot.openKoreExecArgs);
     } else {
       form.reset();
     }
@@ -198,8 +198,8 @@ function FormBot(props: Props) {
             <TabsTrigger value="general">Geral</TabsTrigger>
             <TabsTrigger value="game">Jogo</TabsTrigger>
             <TabsTrigger value="access">Acesso</TabsTrigger>
-            <TabsTrigger value="ghost">Ghost</TabsTrigger>
-            <TabsTrigger value="openkore">OpenKore</TabsTrigger>
+            {/* <TabsTrigger value="ghost">Ghost</TabsTrigger> */}
+            {/* <TabsTrigger value="openkore">OpenKore</TabsTrigger> */}
           </TabsList>
           <TabsContent value="general" className="flex flex-col gap-4 pt-4">
             <FormField
@@ -354,7 +354,7 @@ function FormBot(props: Props) {
             )}
           </TabsContent>
 
-          <TabsContent value="ghost" className="flex flex-col gap-4 pt-4">
+          {/* <TabsContent value="ghost" className="flex flex-col gap-4 pt-4">
             <FormField
               control={form.control}
               name="ghostIp"
@@ -415,7 +415,7 @@ function FormBot(props: Props) {
                 </FormItem>
               )}
             />
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
 
         {showButtons && (

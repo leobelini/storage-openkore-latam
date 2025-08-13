@@ -11,11 +11,11 @@ export interface ConfigFileBot {
     
     totpSecret?: string
     
-    ghostIp: string
-    ghostPort: number
+    // ghostIp: string
+    // ghostPort: number
 
-    openKoreExecPath: string
-    openKoreExecArgs?: string
+    // openKoreExecPath: string
+    // openKoreExecArgs?: string
 }
 
 export interface ConfigFile {
