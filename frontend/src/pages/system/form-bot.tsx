@@ -23,7 +23,7 @@ const formSchema = z.object({
 
   gameLogin: z.string().optional(),
   gamePassword: z.string().optional(),
-  gameExecPath: z.string().optional(),
+  // gameExecPath: z.string().optional(),
   gameAccessPassword: z.string().optional(),
   storageAccessPassword: z.string().optional(),
 
@@ -61,7 +61,7 @@ function FormBot(props: Props) {
       description: "",
       gameAccessPassword: "",
       storageAccessPassword: "",
-      gameExecPath: "",
+      // gameExecPath: "",
       gameLogin: "",
       gamePassword: "",
       // ghostIp: "",
@@ -73,45 +73,45 @@ function FormBot(props: Props) {
     },
   })
 
-  const handleSetFieldFile = useCallback(
-    async (name: FieldPath<FormData>) => {
-      try {
-        const configMap: Partial<Record<FieldPath<FormData>, main.ReplaceFileConfigParam>> = {
-          gameExecPath: new main.ReplaceFileConfigParam({
-            Title: "Selecione o arquivo",
-            Filter: [
-              new frontend.FileFilter({
-                DisplayName: "Jogo Ragnarok",
-                Pattern: "Ragexe.exe",
-              }),
-            ],
-          }),
-          // openKoreExecPath: new main.ReplaceFileConfigParam({
-          //   Title: "Selecione o arquivo",
-          //   Filter: [
-          //     new frontend.FileFilter({
-          //       DisplayName: "OpenKore",
-          //       Pattern: "start.exe;tkstart.exe;vxstart.exe;winguistart.exe;wxstart.exe",
-          //     }),
-          //   ],
-          // }),
-        };
+  // const handleSetFieldFile = useCallback(
+  //   async (name: FieldPath<FormData>) => {
+  //     try {
+  //       const configMap: Partial<Record<FieldPath<FormData>, main.ReplaceFileConfigParam>> = {
+  //         // gameExecPath: new main.ReplaceFileConfigParam({
+  //         //   Title: "Selecione o arquivo",
+  //         //   Filter: [
+  //         //     new frontend.FileFilter({
+  //         //       DisplayName: "Jogo Ragnarok",
+  //         //       Pattern: "Ragexe.exe",
+  //         //     }),
+  //         //   ],
+  //         // }),
+  //         // openKoreExecPath: new main.ReplaceFileConfigParam({
+  //         //   Title: "Selecione o arquivo",
+  //         //   Filter: [
+  //         //     new frontend.FileFilter({
+  //         //       DisplayName: "OpenKore",
+  //         //       Pattern: "start.exe;tkstart.exe;vxstart.exe;winguistart.exe;wxstart.exe",
+  //         //     }),
+  //         //   ],
+  //         // }),
+  //       };
 
-        const params = configMap[name];
-        if (!params) throw new Error("Nenhuma opção selecionada");
+  //       const params = configMap[name];
+  //       if (!params) throw new Error("Nenhuma opção selecionada");
 
-        const value = await GetPathFile(params);
-        form.setValue(name, value);
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Não foi possível selecionar o arquivo";
-        toast(message);
-      }
-    },
-    [form, toast]
-  );
+  //       const value = await GetPathFile(params);
+  //       form.setValue(name, value);
+  //     } catch (error) {
+  //       const message =
+  //         error instanceof Error
+  //           ? error.message
+  //           : "Não foi possível selecionar o arquivo";
+  //       toast(message);
+  //     }
+  //   },
+  //   [form, toast]
+  // );
 
   const handleCopyValue = useCallback((name: FieldPath<FormData>) => {
     const value = form.getValues(name);
@@ -141,7 +141,7 @@ function FormBot(props: Props) {
         description: data.description,
         gameLogin: data.gameLogin,
         gamePassword: data.gamePassword,
-        gameExecPath: data.gameExecPath,
+        // gameExecPath: data.gameExecPath,
         gameAccessPassword: data.gameAccessPassword,
         storageAccessPassword: data.storageAccessPassword,
         totpSecret: data.totpSecret,
@@ -167,7 +167,7 @@ function FormBot(props: Props) {
       form.setValue("description", bot.description);
       form.setValue("gameLogin", bot.gameLogin);
       form.setValue("gamePassword", bot.gamePassword);
-      form.setValue("gameExecPath", bot.gameExecPath);
+      // form.setValue("gameExecPath", bot.gameExecPath);
       form.setValue("gameAccessPassword", bot.gameAccessPassword);
       form.setValue("storageAccessPassword", bot.storageAccessPassword);
       form.setValue("totpSecret", bot.totpSecret);
@@ -234,7 +234,7 @@ function FormBot(props: Props) {
           </TabsContent>
 
           <TabsContent value="game" className="flex flex-col gap-4 pt-4">
-            <FormField
+            {/* <FormField
               control={form.control}
               name="gameExecPath"
               render={({ field }) => (
@@ -252,7 +252,7 @@ function FormBot(props: Props) {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}
@@ -278,7 +278,7 @@ function FormBot(props: Props) {
               name="storageAccessPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PIN de armazenamento</FormLabel>
+                  <FormLabel>PIN da kafra</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
                       <Input type={showStorageAccessPassword ? "text" : "password"} {...field} disabled={isPreview} />

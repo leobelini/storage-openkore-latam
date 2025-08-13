@@ -21,7 +21,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 function SelectFile() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { loadFile } = useSystemContext();
 
