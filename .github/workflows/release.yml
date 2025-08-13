@@ -4,10 +4,8 @@ name: Build and Release Wails App
 # Gatilhos (Triggers)
 on:
   push:
-    branches:
-      - main
     tags:
-      - "v*" # Roda quando uma tag como v1.0.0 é enviada
+      - "v*" # Roda SOMENTE quando uma tag como v1.0.0 é enviada
 
 jobs:
   # Job para compilar a aplicação para diferentes arquiteturas
@@ -44,7 +42,7 @@ jobs:
 
       - name: Compilar a aplicação (Build)
         # Compila o executável com um nome específico para a arquitetura
-        run: wails build -o "MeuApp-${{ matrix.arch }}.exe"
+        run: wails build -o "Storage Openkore Latam-${{ matrix.arch }}.exe"
         shell: pwsh
         env:
           # Define a arquitetura de destino para o compilador do Go
@@ -56,7 +54,7 @@ jobs:
         with:
           # Nome do artefato é único para cada arquitetura para evitar sobreposição
           name: build-artifact-${{ matrix.arch }}
-          path: MeuApp-${{ matrix.arch }}.exe
+          path: Storage Openkore Latam-${{ matrix.arch }}.exe
 
   # Job para criar o Release no GitHub
   release:
@@ -68,6 +66,11 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
+      - name: Criar diretório para os artefatos
+        # Garante que o diretório de destino exista antes de tentar baixar os arquivos.
+        # Isso evita o erro "No such file or directory".
+        run: mkdir -p dist
+
       - name: Baixar todos os artefatos de build
         # Baixa todos os artefatos salvos pelo job 'build'
         uses: actions/download-artifact@v4
