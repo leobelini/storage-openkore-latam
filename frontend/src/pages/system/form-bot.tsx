@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
-import { CopyIcon, EyeIcon, EyeOffIcon, Gamepad2Icon } from "lucide-react";
+import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 
 import type { ConfigFileBot } from "@/types/config-file";
 
@@ -12,8 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TotpCode } from "@/components/ui/totp-code";
-import { GetPathFile } from '../../../wailsjs/go/main/App';
-import { frontend, main } from "../../../wailsjs/go/models";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
