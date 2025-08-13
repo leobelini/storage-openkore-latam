@@ -28,12 +28,21 @@ jobs:
 
       - name: Instalar PNPM
         uses: pnpm/action-setup@v2
+        with:
+          version: 9 # ou a versão que você usa
+
+      - name: Instalar dependências do frontend
+        run: |
+          cd frontend
+          pnpm install
+        shell: bash
 
       - name: Build
         run: |
           $env:GOOS = "windows"
           $env:GOARCH = "${{ matrix.arch }}"
           wails build -o "build/MeuApp-${{ matrix.arch }}.exe"
+        shell: pwsh
 
       - name: Publicar no Release
         if: startsWith(github.ref, 'refs/tags/')
