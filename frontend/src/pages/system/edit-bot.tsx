@@ -1,19 +1,23 @@
-import { toast } from "sonner";
-import { PencilIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { toast } from 'sonner';
+import { PencilIcon } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
-import type { ConfigFileBot } from "@/types/config-file";
+import type { ConfigFileBot } from '@/types/config-file';
 
-import FormBot from "./form-bot";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
-
+import FormBot from './form-bot';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 type Props = {
-  bot: ConfigFileBot
-  handleEdit: (bot: ConfigFileBot) => Promise<void>
-}
+  bot: ConfigFileBot;
+  handleEdit: (bot: ConfigFileBot) => Promise<void>;
+};
 
 function EditBot(props: Props) {
   const [open, setOpen] = useState(false);
@@ -23,16 +27,17 @@ function EditBot(props: Props) {
       await props.handleEdit(bot);
       setOpen(false);
     } catch (error) {
-      toast("Não foi possível editar o bot");
+      toast('Não foi possível editar o bot');
       return;
     }
-
   }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="icon" variant="ghost"><PencilIcon /></Button>
+        <Button size='icon' variant='ghost'>
+          <PencilIcon />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -47,7 +52,7 @@ function EditBot(props: Props) {
         />
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default EditBot
+export default EditBot;

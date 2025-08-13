@@ -1,22 +1,32 @@
-import { z } from "zod"
-import { toast } from "sonner";
+import { z } from 'zod';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
-import { useForm, type FieldPath } from "react-hook-form";
-import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm, type FieldPath } from 'react-hook-form';
+import { CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
-import type { ConfigFileBot } from "@/types/config-file";
+import type { ConfigFileBot } from '@/types/config-file';
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { TotpCode } from "@/components/ui/totp-code";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { TotpCode } from '@/components/ui/totp-code';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 const formSchema = z.object({
-  name: z.string().min(4, "Informe nome com no mínimo 4 caracteres").max(50, "O nome deve ter no máximo 50 caracteres"),
+  name: z
+    .string()
+    .min(4, 'Informe nome com no mínimo 4 caracteres')
+    .max(50, 'O nome deve ter no máximo 50 caracteres'),
   description: z.string().optional(),
 
   gameLogin: z.string().optional(),
@@ -34,9 +44,9 @@ const formSchema = z.object({
   //   .refine((value) => !isNaN(parseInt(value)), "Informe um número válido"),
   // openKoreExecPath: z.string().min(1, "Informe um caminho válido"),
   // openKoreExecArgs: z.string().optional(),
-})
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 type Props = {
   isPreview?: boolean;
@@ -45,31 +55,32 @@ type Props = {
   onCancel?: () => void;
   showButtons?: boolean;
   copyButtons?: boolean;
-}
+};
 function FormBot(props: Props) {
-
-  const { bot, copyButtons, isPreview, onSubmit, showButtons, onCancel } = props
+  const { bot, copyButtons, isPreview, onSubmit, showButtons, onCancel } =
+    props;
 
   const [showGameAccessPassword, setShowGameAccessPassword] = useState(false);
-  const [showStorageAccessPassword, setShowStorageAccessPassword] = useState(false);
+  const [showStorageAccessPassword, setShowStorageAccessPassword] =
+    useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
-      gameAccessPassword: "",
-      storageAccessPassword: "",
+      description: '',
+      gameAccessPassword: '',
+      storageAccessPassword: '',
       // gameExecPath: "",
-      gameLogin: "",
-      gamePassword: "",
+      gameLogin: '',
+      gamePassword: '',
       // ghostIp: "",
       // ghostPort: null!,
-      name: "",
+      name: '',
       // openKoreExecArgs: "",
       // openKoreExecPath: "",
-      totpSecret: "",
+      totpSecret: '',
     },
-  })
+  });
 
   // const handleSetFieldFile = useCallback(
   //   async (name: FieldPath<FormData>) => {
@@ -111,64 +122,70 @@ function FormBot(props: Props) {
   //   [form, toast]
   // );
 
-  const handleCopyValue = useCallback((name: FieldPath<FormData>) => {
-    const value = form.getValues(name);
-    navigator.clipboard.writeText(value || "");
-    toast("Valor copiado para a área de transferência", {
-      icon: <CopyIcon />,
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
+  const handleCopyValue = useCallback(
+    (name: FieldPath<FormData>) => {
+      const value = form.getValues(name);
+      navigator.clipboard.writeText(value || '');
+      toast('Valor copiado para a área de transferência', {
+        icon: <CopyIcon />,
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
+    },
+    [form],
+  );
+
+  const handleSubmit = useCallback(
+    async (data: FormData) => {
+      if (!onSubmit) return;
+      try {
+        let id = bot?.id;
+
+        if (!id) {
+          id = uuidv4();
+        }
+
+        const botValues: ConfigFileBot = {
+          id,
+          name: data.name,
+          description: data.description,
+          gameLogin: data.gameLogin,
+          gamePassword: data.gamePassword,
+          // gameExecPath: data.gameExecPath,
+          gameAccessPassword: data.gameAccessPassword,
+          storageAccessPassword: data.storageAccessPassword,
+          totpSecret: data.totpSecret,
+          // ghostIp: data.ghostIp,
+          // ghostPort: Number(data.ghostPort),
+          // openKoreExecPath: data.openKoreExecPath,
+          // openKoreExecArgs: data.openKoreExecArgs,
+        };
+
+        await onSubmit(botValues);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Ocorreu um erro ao criar o bot';
+        toast(message);
       }
-    });
-  }, [form]);
-
-  const handleSubmit = useCallback(async (data: FormData) => {
-    if (!onSubmit) return;
-    try {
-      let id = bot?.id
-
-      if (!id) {
-        id = uuidv4();
-      }
-
-      const botValues: ConfigFileBot = {
-        id,
-        name: data.name,
-        description: data.description,
-        gameLogin: data.gameLogin,
-        gamePassword: data.gamePassword,
-        // gameExecPath: data.gameExecPath,
-        gameAccessPassword: data.gameAccessPassword,
-        storageAccessPassword: data.storageAccessPassword,
-        totpSecret: data.totpSecret,
-        // ghostIp: data.ghostIp,
-        // ghostPort: Number(data.ghostPort),
-        // openKoreExecPath: data.openKoreExecPath,
-        // openKoreExecArgs: data.openKoreExecArgs,
-      }
-
-      await onSubmit(botValues)
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Ocorreu um erro ao criar o bot";
-      toast(message);
-    }
-  }, [onSubmit, bot])
+    },
+    [onSubmit, bot],
+  );
 
   const fillForm = useCallback((bot?: ConfigFileBot) => {
     if (bot) {
-      form.setValue("name", bot.name);
-      form.setValue("description", bot.description);
-      form.setValue("gameLogin", bot.gameLogin);
-      form.setValue("gamePassword", bot.gamePassword);
+      form.setValue('name', bot.name);
+      form.setValue('description', bot.description);
+      form.setValue('gameLogin', bot.gameLogin);
+      form.setValue('gamePassword', bot.gamePassword);
       // form.setValue("gameExecPath", bot.gameExecPath);
-      form.setValue("gameAccessPassword", bot.gameAccessPassword);
-      form.setValue("storageAccessPassword", bot.storageAccessPassword);
-      form.setValue("totpSecret", bot.totpSecret);
+      form.setValue('gameAccessPassword', bot.gameAccessPassword);
+      form.setValue('storageAccessPassword', bot.storageAccessPassword);
+      form.setValue('totpSecret', bot.totpSecret);
       // form.setValue("ghostIp", bot.ghostIp);
       // form.setValue("ghostPort", bot.ghostPort.toString());
       // form.setValue("openKoreExecPath", bot.openKoreExecPath);
@@ -176,38 +193,42 @@ function FormBot(props: Props) {
     } else {
       form.reset();
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (bot) {
-      fillForm(bot)
-      setShowGameAccessPassword(false)
-      setShowStorageAccessPassword(false)
+      fillForm(bot);
+      setShowGameAccessPassword(false);
+      setShowStorageAccessPassword(false);
     }
-  }, [bot])
+  }, [bot]);
 
   return (
-
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
-
-        <Tabs defaultValue="general">
-          <TabsList className="w-full">
-            <TabsTrigger value="general">Geral</TabsTrigger>
-            <TabsTrigger value="game">Jogo</TabsTrigger>
-            <TabsTrigger value="access">Acesso</TabsTrigger>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className='flex flex-col gap-4'
+      >
+        <Tabs defaultValue='general'>
+          <TabsList className='w-full'>
+            <TabsTrigger value='general'>Geral</TabsTrigger>
+            <TabsTrigger value='game'>Jogo</TabsTrigger>
+            <TabsTrigger value='access'>Acesso</TabsTrigger>
             {/* <TabsTrigger value="ghost">Ghost</TabsTrigger> */}
             {/* <TabsTrigger value="openkore">OpenKore</TabsTrigger> */}
           </TabsList>
-          <TabsContent value="general" className="flex flex-col gap-4 pt-4">
+          <TabsContent value='general' className='flex flex-col gap-4 pt-4'>
             <FormField
               control={form.control}
-              name="name"
+              name='name'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do bot{!isPreview && <span className="text-destructive">*</span>}</FormLabel>
+                  <FormLabel>
+                    Nome do bot
+                    {!isPreview && <span className='text-destructive'>*</span>}
+                  </FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} disabled={isPreview} />
+                    <Input type='text' {...field} disabled={isPreview} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -215,13 +236,15 @@ function FormBot(props: Props) {
             />
             <FormField
               control={form.control}
-              name="description"
+              name='description'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Textarea {...field} disabled={isPreview}
-                      className="resize-none"
+                    <Textarea
+                      {...field}
+                      disabled={isPreview}
+                      className='resize-none'
                       rows={5}
                     />
                   </FormControl>
@@ -231,7 +254,7 @@ function FormBot(props: Props) {
             />
           </TabsContent>
 
-          <TabsContent value="game" className="flex flex-col gap-4 pt-4">
+          <TabsContent value='game' className='flex flex-col gap-4 pt-4'>
             {/* <FormField
               control={form.control}
               name="gameExecPath"
@@ -254,15 +277,25 @@ function FormBot(props: Props) {
 
             <FormField
               control={form.control}
-              name="gameAccessPassword"
+              name='gameAccessPassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>PIN de acesso</FormLabel>
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     <FormControl>
-                      <Input type={showGameAccessPassword ? "text" : "password"} {...field} disabled={isPreview} />
+                      <Input
+                        type={showGameAccessPassword ? 'text' : 'password'}
+                        {...field}
+                        disabled={isPreview}
+                      />
                     </FormControl>
-                    <Button type="button" size="icon" onClick={() => setShowGameAccessPassword(!showGameAccessPassword)}>
+                    <Button
+                      type='button'
+                      size='icon'
+                      onClick={() =>
+                        setShowGameAccessPassword(!showGameAccessPassword)
+                      }
+                    >
                       {showGameAccessPassword ? <EyeIcon /> : <EyeOffIcon />}
                     </Button>
                   </div>
@@ -273,15 +306,25 @@ function FormBot(props: Props) {
 
             <FormField
               control={form.control}
-              name="storageAccessPassword"
+              name='storageAccessPassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>PIN da kafra</FormLabel>
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     <FormControl>
-                      <Input type={showStorageAccessPassword ? "text" : "password"} {...field} disabled={isPreview} />
+                      <Input
+                        type={showStorageAccessPassword ? 'text' : 'password'}
+                        {...field}
+                        disabled={isPreview}
+                      />
                     </FormControl>
-                    <Button type="button" size="icon" onClick={() => setShowStorageAccessPassword(!showStorageAccessPassword)}>
+                    <Button
+                      type='button'
+                      size='icon'
+                      onClick={() =>
+                        setShowStorageAccessPassword(!showStorageAccessPassword)
+                      }
+                    >
                       {showStorageAccessPassword ? <EyeIcon /> : <EyeOffIcon />}
                     </Button>
                   </div>
@@ -291,20 +334,26 @@ function FormBot(props: Props) {
             />
           </TabsContent>
 
-          <TabsContent value="access" className="flex flex-col gap-4 pt-4">
+          <TabsContent value='access' className='flex flex-col gap-4 pt-4'>
             <FormField
               control={form.control}
-              name="gameLogin"
+              name='gameLogin'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Login</FormLabel>
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     <FormControl>
-                      <Input type="password" {...field} disabled={isPreview} />
+                      <Input type='password' {...field} disabled={isPreview} />
                     </FormControl>
-                    {copyButtons &&
-                      <Button type="button" size="icon" onClick={() => handleCopyValue("gameLogin")}><CopyIcon /></Button>
-                    }
+                    {copyButtons && (
+                      <Button
+                        type='button'
+                        size='icon'
+                        onClick={() => handleCopyValue('gameLogin')}
+                      >
+                        <CopyIcon />
+                      </Button>
+                    )}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -312,17 +361,23 @@ function FormBot(props: Props) {
             />
             <FormField
               control={form.control}
-              name="gamePassword"
+              name='gamePassword'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     <FormControl>
-                      <Input type="password" {...field} disabled={isPreview} />
+                      <Input type='password' {...field} disabled={isPreview} />
                     </FormControl>
-                    {copyButtons &&
-                      <Button type="button" size="icon" onClick={() => handleCopyValue("gamePassword")}><CopyIcon /></Button>
-                    }
+                    {copyButtons && (
+                      <Button
+                        type='button'
+                        size='icon'
+                        onClick={() => handleCopyValue('gamePassword')}
+                      >
+                        <CopyIcon />
+                      </Button>
+                    )}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -331,12 +386,12 @@ function FormBot(props: Props) {
             {!isPreview && (
               <FormField
                 control={form.control}
-                name="totpSecret"
+                name='totpSecret'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Chave de autenticação (TOTP)</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} disabled={isPreview} />
+                      <Input type='password' {...field} disabled={isPreview} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -345,7 +400,7 @@ function FormBot(props: Props) {
             )}
 
             {isPreview && bot?.totpSecret && (
-              <div className="flex flex-col gap-4">
+              <div className='flex flex-col gap-4'>
                 <FormLabel>TOTP</FormLabel>
                 <TotpCode totpSecret={bot.totpSecret} />
               </div>
@@ -417,18 +472,22 @@ function FormBot(props: Props) {
         </Tabs>
 
         {showButtons && (
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => {
-              form.reset();
-              if (onCancel) onCancel();
-            }}>Cancelar</Button>
-            <Button type="submit">Salvar</Button>
+          <div className='flex justify-end gap-2 pt-4'>
+            <Button
+              variant='outline'
+              onClick={() => {
+                form.reset();
+                if (onCancel) onCancel();
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button type='submit'>Salvar</Button>
           </div>
         )}
       </form>
     </Form>
-
-  )
+  );
 }
 
-export default FormBot
+export default FormBot;

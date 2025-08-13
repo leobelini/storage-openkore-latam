@@ -1,67 +1,86 @@
-import { z } from "zod"
-import { toast } from "sonner"
-import { useForm } from "react-hook-form"
-import { useCallback, useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { useCallback, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import type { ConfigFile } from "@/types/config-file"
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import type { ConfigFile } from '@/types/config-file';
 import { SelectFolder, CreateFileConfig } from '../../../wailsjs/go/main/App';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const formSchema = z.object({
-  password: z.string().min(1, "Informe uma senha"),
-  filename: z.string().min(1, "Informe um nome").max(50, "O nome deve ter no máximo 50 caracteres").regex(/^[a-z0-9]+$/i, "O nome deve conter apenas letras e números"),
-})
+  password: z.string().min(1, 'Informe uma senha'),
+  filename: z
+    .string()
+    .min(1, 'Informe um nome')
+    .max(50, 'O nome deve ter no máximo 50 caracteres')
+    .regex(/^[a-z0-9]+$/i, 'O nome deve conter apenas letras e números'),
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 function NewFile() {
-
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      password: "",
-      filename: "",
+      password: '',
+      filename: '',
     },
-  })
+  });
 
   const onSubmit = useCallback(async (data: FormData) => {
     try {
-      let folder = "";
+      let folder = '';
       try {
         folder = await SelectFolder();
 
         if (!folder) {
-          toast("Selecione uma pasta")
+          toast('Selecione uma pasta');
           return;
         }
       } catch (error) {
-        toast("Selecione uma pasta")
+        toast('Selecione uma pasta');
         return;
       }
       const content: ConfigFile = {
-        valid: true
-      }
+        valid: true,
+      };
 
       const contentString = JSON.stringify(content);
 
-      const fileName = [data.filename, ".start-openkore-latam"].join("");
+      const fileName = [data.filename, '.start-openkore-latam'].join('');
 
       await CreateFileConfig(folder, fileName, data.password, contentString);
 
-      toast("Arquivo criado com sucesso!")
+      toast('Arquivo criado com sucesso!');
       form.reset();
       setOpen(false);
     } catch (error) {
-      toast("Não foi possível criar o arquivo")
+      toast('Não foi possível criar o arquivo');
       return;
     }
-  }, [])
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -70,21 +89,25 @@ function NewFile() {
       </DialogTrigger>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className='flex flex-col gap-4'
+          >
             <DialogHeader>
               <DialogTitle>Nova configuração</DialogTitle>
             </DialogHeader>
             <FormField
               control={form.control}
-              name="password"
+              name='password'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Senha de acesso</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type='password' {...field} />
                   </FormControl>
                   <FormDescription>
-                    Essa senha será usada criptografar as informações de acesso e solicitar sempre que abrir.
+                    Essa senha será usada criptografar as informações de acesso
+                    e solicitar sempre que abrir.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -92,7 +115,7 @@ function NewFile() {
             />
             <FormField
               control={form.control}
-              name="filename"
+              name='filename'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nome do arquivo</FormLabel>
@@ -103,17 +126,17 @@ function NewFile() {
                 </FormItem>
               )}
             />
-            <DialogFooter className="flex flex-row gap-2 justify-end">
+            <DialogFooter className='flex flex-row gap-2 justify-end'>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant='outline'>Cancel</Button>
               </DialogClose>
-              <Button type="submit">Criar</Button>
+              <Button type='submit'>Criar</Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default NewFile
+export default NewFile;
