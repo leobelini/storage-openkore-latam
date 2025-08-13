@@ -23,6 +23,9 @@ jobs:
 
       - name: Instalar Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      
+      - name: Instalar PNPM
+        uses: pnpm/action-setup@v2
 
       - name: Build
         run: |
