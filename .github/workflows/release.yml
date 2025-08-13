@@ -1,21 +1,24 @@
-name: Build Wails App
+# Nome do Workflow
+name: Build and Release Wails App
 
+# Gatilhos (Triggers)
 on:
   push:
     branches:
       - main
     tags:
-      - "v*"
+      - "v*" # Roda quando uma tag como v1.0.0 é enviada
 
 jobs:
+  # Job para compilar a aplicação para diferentes arquiteturas
   build:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch: [amd64, 386]
+        arch: [amd64, 386] # Matriz para compilar para 64 e 32 bits
 
     steps:
-      - name: Checkout código
+      - name: Checkout do código
         uses: actions/checkout@v4
 
       - name: Instalar Go
@@ -23,7 +26,7 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Instalar Wails
+      - name: Instalar Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Instalar PNPM
@@ -32,24 +35,56 @@ jobs:
           version: 10
           run_install: false
 
-      - name: Install Node.js
+      - name: Instalar Node.js
         uses: actions/setup-node@v4
 
       - name: Instalar dependências do frontend
         working-directory: frontend
         run: pnpm install
 
-      - name: Build
-        run: |
-          $env:GOOS = "windows"
-          $env:GOARCH = "${{ matrix.arch }}"
-          wails build -o "build/MeuApp-${{ matrix.arch }}.exe"
+      - name: Compilar a aplicação (Build)
+        # Compila o executável com um nome específico para a arquitetura
+        run: wails build -o "MeuApp-${{ matrix.arch }}.exe"
         shell: pwsh
+        env:
+          # Define a arquitetura de destino para o compilador do Go
+          GOARCH: ${{ matrix.arch }}
 
-      - name: Publicar no Release
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Fazer upload do executável como artefato
+        # Salva o .exe compilado como um artefato do workflow para ser usado depois
+        uses: actions/upload-artifact@v4
+        with:
+          # Nome do artefato é único para cada arquitetura para evitar sobreposição
+          name: build-artifact-${{ matrix.arch }}
+          path: MeuApp-${{ matrix.arch }}.exe
+
+  # Job para criar o Release no GitHub
+  release:
+    # Este job só começa depois que todos os jobs de 'build' terminarem com sucesso
+    needs: build
+    runs-on: ubuntu-latest # Pode ser ubuntu, pois só vai lidar com arquivos
+
+    # Condição: SÓ RODA SE O WORKFLOW FOI ACIONADO POR UMA TAG
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Baixar todos os artefatos de build
+        # Baixa todos os artefatos salvos pelo job 'build'
+        uses: actions/download-artifact@v4
+        with:
+          # O diretório de destino para os arquivos baixados
+          path: dist
+
+      - name: Verificar arquivos baixados (opcional)
+        # Lista os arquivos para garantir que o download funcionou
+        run: ls -R dist
+
+      - name: Criar e Publicar Release
+        # Usa a action para criar um release no GitHub
         uses: softprops/action-gh-release@v2
         with:
-          files: build/*.exe
+          # Anexa todos os arquivos .exe encontrados no diretório 'dist' e suas subpastas
+          files: dist/**/*.exe
         env:
+          # O token é necessário para dar permissão à action para criar o release
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
