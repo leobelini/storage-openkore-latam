@@ -1,0 +1,38 @@
+name: Build Wails App
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [amd64, 386]
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+
+      - name: Instalar Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Build
+        run: |
+          $env:GOOS = "windows"
+          $env:GOARCH = "${{ matrix.arch }}"
+          wails build -o "build/MeuApp-${{ matrix.arch }}.exe"
+
+      - name: Publicar no Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
