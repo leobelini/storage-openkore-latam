@@ -1,19 +1,30 @@
-# README
 
-## About
+# Storage - Openkore Latam
 
-This is the official Wails React-TS template.
+Programa desenvolvido em *GO* e *React* para controle de várias contas no Ragnarok. Focado no Openkore.
+Portátil e seguro, armazena as informaçoes em arquivos criptografados.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
 
-## Live Development
+## Recursos
+- Adicionar/editar/remover contas
+- Criptografia das informações
+- Armazenamento das informações de acesso:
+  - Nome/Descrição
+  - PIN de acesso a conta/PIN da kafra
+  - Login/Senha/TOTP
+- Função de cópia rápida
+## Screenshots
+|   |   |
+|---|---|
+| <img src="https://github.com/leobelini/storage-openkore-latam/blob/main/docs/Screenshot_1.png?raw=true"  height="300"> | <img src="https://github.com/leobelini/storage-openkore-latam/blob/main/docs/Screenshot_2.png?raw=true"  height="300"> | 
+| <img src="https://github.com/leobelini/storage-openkore-latam/blob/main/docs/Screenshot_3.png?raw=true"  height="300"> | <img src="https://github.com/leobelini/storage-openkore-latam/blob/main/docs/Screenshot_4.png?raw=true"  height="300"> |
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
 
-## Building
+## Guia
 
-To build a redistributable, production mode package, use `wails build`.
+Para adicionar o **TOTP** é necessário colocar o token que é gerado no site do Ragnarok
+
+
+## Instalação
+
+Baixar e executar
