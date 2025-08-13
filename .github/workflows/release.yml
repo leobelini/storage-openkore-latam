@@ -27,13 +27,14 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Instalar PNPM
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9 # ou a versão que você usa
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
 
       - name: Instalar dependências do frontend
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build
         run: |
